@@ -25,7 +25,8 @@ class TraceNode:
                 ">")
 
 
-def _traverse(pop_fn: Callable[[deque], T], start: Generic[T], successors: Callable[[T], Iterable[T]]) -> Iterable[T]:
+def _untraced_traverse(pop_fn: Callable[[deque], T], start: Generic[T], successors: Callable[[T], Iterable[T]]) -> \
+        Iterable[T]:
     frontier = deque([start])
     seen = set()
 
@@ -39,12 +40,12 @@ def _traverse(pop_fn: Callable[[deque], T], start: Generic[T], successors: Calla
             frontier.append(successor)
 
 
-bft = partial(_traverse, pop_fn=lambda frontier: frontier.popleft())
-dft = partial(_traverse, pop_fn=lambda frontier: frontier.pop())
+untraced_bft = partial(_untraced_traverse, pop_fn=lambda frontier: frontier.popleft())
+untraced_dft = partial(_untraced_traverse, pop_fn=lambda frontier: frontier.pop())
 
 
-def _traced_traverse(pop_fn: Callable[[deque], TraceNode], start: Generic[T],
-                     successors: Callable[[T], Iterable[T]]) \
+def _traverse(pop_fn: Callable[[deque], TraceNode], start: Generic[T],
+              successors: Callable[[T], Iterable[T]]) \
         -> Iterable[TraceNode]:
     frontier = deque([TraceNode(value=start, steps=0, parent=None)])
     seen: Set[TraceNode] = set()
@@ -59,5 +60,5 @@ def _traced_traverse(pop_fn: Callable[[deque], TraceNode], start: Generic[T],
             frontier.append(TraceNode(value=successor, steps=node.steps + 1, parent=node))
 
 
-traced_bft = partial(_traced_traverse, pop_fn=lambda frontier: frontier.popleft())
-traced_dft = partial(_traced_traverse, pop_fn=lambda frontier: frontier.pop())
+bft = partial(_traverse, pop_fn=lambda frontier: frontier.popleft())
+dft = partial(_traverse, pop_fn=lambda frontier: frontier.pop())
