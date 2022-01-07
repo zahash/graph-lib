@@ -42,3 +42,11 @@ class SimpleBinaryGridGraph:
         for r, c in [(r + 1, c), (r, c + 1), (r - 1, c), (r, c - 1)]:
             if self._valid_pos((r, c)):
                 yield r, c
+
+
+class SimpleDictGraph:
+    def __init__(self, graph: dict):
+        self._graph = graph
+
+    def successors(self, node: str) -> List[str]:
+        return self._graph.get(node, [])

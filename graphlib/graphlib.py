@@ -62,3 +62,11 @@ def _traverse(pop_fn: Callable[[deque], TraceNode], start: Generic[T],
 
 bft = partial(_traverse, pop_fn=lambda frontier: frontier.popleft())
 dft = partial(_traverse, pop_fn=lambda frontier: frontier.pop())
+
+
+def bfs(start: Generic[T],
+        goal: Generic[T],
+        successors: Callable[[T], Iterable[T]]) -> Optional[TraceNode]:
+    for node in bft(start=start, successors=successors):
+        if node.value == goal:
+            return node
