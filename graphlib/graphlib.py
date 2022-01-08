@@ -44,8 +44,9 @@ untraced_bft = partial(_untraced_traverse, pop_fn=lambda frontier: frontier.popl
 untraced_dft = partial(_untraced_traverse, pop_fn=lambda frontier: frontier.pop())
 
 
-def _traverse(pop_fn: Callable[[deque], TraceNode], start: Generic[T],
-              successors: Callable[[T], Iterable[T]]) \
+def _traverse(start: Generic[T],
+              successors: Callable[[T], Iterable[T]],
+              pop_fn: Callable[[deque], TraceNode]) \
         -> Iterable[TraceNode]:
     frontier = deque([TraceNode(value=start, steps=0, parent=None)])
     seen: Set[TraceNode] = set()
@@ -64,9 +65,14 @@ bft = partial(_traverse, pop_fn=lambda frontier: frontier.popleft())
 dft = partial(_traverse, pop_fn=lambda frontier: frontier.pop())
 
 
-def bfs(start: Generic[T],
-        goal: Generic[T],
-        successors: Callable[[T], Iterable[T]]) -> Optional[TraceNode]:
-    for node in bft(start=start, successors=successors):
+def _blind_search(start: Generic[T],
+                  goal: Generic[T],
+                  successors: Callable[[T], Iterable[T]],
+                  traverser: Callable[[Generic[T], Callable[[T], Iterable[T]]], Iterable[TraceNode]]):
+    for node in traverser(start, successors):
         if node.value == goal:
             return node
+
+
+bfs = partial(_blind_search, traverser=bft)
+dfs = partial(_blind_search, traverser=dft)
